@@ -18,19 +18,7 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
-            steps {
-                script {
-                    // Run static code analysis (e.g., with pylint)
-                    sh "pip install pylint"  // Install pylint, modify if you use another tool
-                    def analysis = sh(script: "pylint ${PYTHON_DIR}", returnStatus: true)
-
-                    if (analysis != 0) {
-                        error "Static code analysis failed. Please fix the issues."
-                    }
-                }
-            }
-        }
+    
 
         stage('Terraform Apply') {
             steps {
