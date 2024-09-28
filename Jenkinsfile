@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Checkout the source code from GitHub
-                    git url: https://github.com/MdAbdullah5/Abdullah_infintudeIT.git, branch: 'main'  // Change to your default branch if needed
+                    git url: 'https://github.com/MdAbdullah5/Abdullah_infintudeIT.git' , branch: 'main'  // Change to your default branch if needed
                 }
             }
         }
