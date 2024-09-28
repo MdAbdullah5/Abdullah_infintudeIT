@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Change directory to where the Terraform script is located
-                    dir(${pwd}) {
+                    
                         sh 'git clone ${GITHUB_REPO}'
                         sh 'cd ./Abdullah_infintudeIT'
                         sh 'terraform init'  // Initialize Terraform
@@ -36,7 +36,7 @@ pipeline {
 
                         // Store the instance IP for later stages
                         env.INSTANCE_IP = instanceIp
-                    }
+                    
                 }
             }
         }
