@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Set environment variables if needed
         GITHUB_REPO = 'https://github.com/MdAbdullah5/Abdullah_infintudeIT.git'
-        TERRAFORM_DIR = 'terraform'
+        TERRAFORM_DIR = './Assignment'
         PYTHON_DIR = 'fastapi_app'
     }
 
@@ -18,17 +17,15 @@ pipeline {
             }
         }
 
-    
-
-        stage('Terraform Apply') {
+        stage('Terraform Init and Apply') {
             steps {
                 script {
-                    // Change directory to where the Terraform script is located
-                    
-                        sh 'git clone ${GITHUB_REPO}'
-                        sh 'cd ./Abdullah_infintudeIT'
-                        sh 'terraform init'  // Initialize Terraform
-                        sh 'terraform apply -auto-approve'  // Apply the Terraform script
+                    // Change to the Terraform directory and initialize/apply Terraform
+                    dir(TERRAFORM_DIR) {
+                        // Initialize Terraform
+                        sh 'terraform init'
+                        // Apply the Terraform script and auto-approve
+                        sh 'terraform apply -auto-approve'
 
                         // Capture the instance IP from Terraform output
                         def instanceIp = sh(script: 'terraform output -json instance_ip', returnStdout: true).trim()
@@ -36,7 +33,7 @@ pipeline {
 
                         // Store the instance IP for later stages
                         env.INSTANCE_IP = instanceIp
-                    
+                    }
                 }
             }
         }
@@ -48,11 +45,11 @@ pipeline {
                     sh """
                     ssh -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << 'EOF'
                     sudo yum install -y git
-                    git clone ${GITHUB_REPO}
-                    cd ./Abdullah_infintudeIT  # Navigate to the FastAPI app directory
+                    git clone ${GITHUB_REPO} fastapi_app
+                    cd fastapi_app/${PYTHON_DIR}  # Navigate to the FastAPI app directory
                     sudo yum install python3-pip -y
-                    sudo pip install fastapi uvicorn sqlite
-                    uvicorn main:app --host 0.0.0.0 --port 8000 &
+                    sudo pip3 install fastapi uvicorn sqlite
+                    nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
                     EOF
                     """
                 }
