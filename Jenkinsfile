@@ -25,7 +25,7 @@ pipeline {
                 script {
                     // Change directory to where the Terraform script is located
                     dir(TERRAFORM_DIR) {
-                        sh 'cd git clone ${GITHUB_REPO}'
+                        sh 'git clone ${GITHUB_REPO}'
                         sh 'cd ./Abdullah_infintudeIT'
                         sh 'terraform init'  // Initialize Terraform
                         sh 'terraform apply -auto-approve'  // Apply the Terraform script
