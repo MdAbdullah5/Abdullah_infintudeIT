@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     // Checkout the source code from GitHub
-                    git url: 'https://github.com/MdAbdullah5/Abdullah_infintudeIT.git' , branch: 'main'  // Change to your default branch if needed
+                    git url: GITHUB_REPO, branch: 'main'  // Change to your default branch if needed
                 }
             }
         }
@@ -21,7 +21,7 @@ pipeline {
         stage('Static Code Analysis') {
             steps {
                 script {
-                    // Run static code analysis (e.g., with pylint or flake8)
+                    // Run static code analysis (e.g., with pylint)
                     sh "pip install pylint"  // Install pylint, modify if you use another tool
                     def analysis = sh(script: "pylint ${PYTHON_DIR}", returnStatus: true)
 
@@ -41,8 +41,11 @@ pipeline {
                         sh 'terraform apply -auto-approve'  // Apply the Terraform script
 
                         // Capture the instance IP from Terraform output
-                        instanceIp = sh(script: 'terraform output -json instance_ip', returnStdout: true).trim()
+                        def instanceIp = sh(script: 'terraform output -json instance_ip', returnStdout: true).trim()
                         echo "Instance IP: ${instanceIp}"  // Print the instance IP
+
+                        // Store the instance IP for later stages
+                        env.INSTANCE_IP = instanceIp
                     }
                 }
             }
@@ -53,13 +56,10 @@ pipeline {
                 script {
                     // SSH into the EC2 instance and run the FastAPI application
                     sh """
-                    ssh -o StrictHostKeyChecking=no ec2-user@${instanceIp} << 'EOF'
-                    sudo yum install git
-                    git clone https://github.com/MdAbdullah5/Abdullah_infintudeIT.git
-                    cd  ./ Abdullah_infintudeIT # Navigate to the FastAPI app directory
-                    # Create a virtual environment and install dependencies
-                    #  python3 -m venv venv
-                    #  source venv/bin/activate
+                    ssh -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << 'EOF'
+                    sudo yum install -y git
+                    git clone ${GITHUB_REPO}
+                    cd ./Abdullah_infintudeIT  # Navigate to the FastAPI app directory
                     sudo yum install python3-pip -y
                     sudo pip install fastapi uvicorn sqlite
                     uvicorn main:app --host 0.0.0.0 --port 8000 &
@@ -68,7 +68,7 @@ pipeline {
                 }
             }
         }
-    
+    }
 
     post {
         always {
