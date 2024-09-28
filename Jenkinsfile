@@ -32,7 +32,6 @@ pipeline {
             }
         }
 
-      stages {
         stage('Terraform Apply') {
             steps {
                 script {
@@ -69,36 +68,7 @@ pipeline {
                 }
             }
         }
-        // stage('Configure Load Balancer') {
-        //     steps {
-        //         script {
-        //             // Assuming you have AWS CLI installed and configured
-        //             sh '''
-        //             aws elbv2 create-load-balancer \
-        //                 --name my-load-balancer \
-        //                 --subnets <SUBNET_ID_1> <SUBNET_ID_2> \
-        //                 --security-groups <SECURITY_GROUP_ID>
-
-        //             aws elbv2 create-target-group \
-        //                 --name my-target-group \
-        //                 --protocol HTTP \
-        //                 --port 80 \
-        //                 --vpc-id <VPC_ID>
-
-        //             aws elbv2 register-targets \
-        //                 --target-group-arn <TARGET_GROUP_ARN> \
-        //                 --targets Id=<EC2_INSTANCE_ID>
-
-        //             aws elbv2 create-listener \
-        //                 --load-balancer-arn <LOAD_BALANCER_ARN> \
-        //                 --protocol HTTP \
-        //                 --port 80 \
-        //                 --default-actions Type=forward,TargetGroupArn=<TARGET_GROUP_ARN>
-        //             '''
-        //         }
-        //     }
-        // }
-    }
+    
 
     post {
         always {
