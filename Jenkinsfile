@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         GITHUB_REPO = 'https://github.com/MdAbdullah5/Abdullah_infintudeIT.git'
-        TERRAFORM_DIR = './Assignment'
+        TERRAFORM_DIR = 'terraform_files' // Directory to store Terraform files
         PYTHON_DIR = 'fastapi_app'
     }
 
@@ -17,13 +17,26 @@ pipeline {
             }
         }
 
+        stage('Prepare Terraform Files') {
+            steps {
+                script {
+                    // Create a directory for Terraform files
+                    sh 'mkdir -p ${TERRAFORM_DIR}'
+
+                    // Fetch the main.tf file from GitHub
+                    sh 'curl -L -o ${TERRAFORM_DIR}/main.tf https://raw.githubusercontent.com/MdAbdullah5/Abdullah_infintudeIT/main.tf'
+                }
+            }
+        }
+
         stage('Terraform Init and Apply') {
             steps {
                 script {
-                    // Change to the Terraform directory and initialize/apply Terraform
+                    // Change directory to where the Terraform file is located
                     dir(TERRAFORM_DIR) {
                         // Initialize Terraform
                         sh 'terraform init'
+                        
                         // Apply the Terraform script and auto-approve
                         sh 'terraform apply -auto-approve'
 
