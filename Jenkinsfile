@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         GITHUB_REPO = 'https://github.com/MdAbdullah5/Abdullah_infintudeIT.git'
-        TERRAFORM_DIR = 'terraform_files' // Directory to store Terraform files
+        TERRAFORM_DIR = './' // Directory to store Terraform files
         PYTHON_DIR = 'fastapi_app'
     }
 
@@ -17,17 +17,7 @@ pipeline {
             }
         }
 
-        stage('Prepare Terraform Files') {
-            steps {
-                script {
-                    // Create a directory for Terraform files
-                    sh 'mkdir -p ${TERRAFORM_DIR}'
 
-                    // Fetch the main.tf file from GitHub
-                    sh 'curl -L -o ${TERRAFORM_DIR}/main.tf https://raw.githubusercontent.com/MdAbdullah5/Abdullah_infintudeIT/main.tf'
-                }
-            }
-        }
 
         stage('Terraform Init and Apply') {
             steps {
@@ -35,6 +25,8 @@ pipeline {
                     // Change directory to where the Terraform file is located
                     dir(TERRAFORM_DIR) {
                         // Initialize Terraform
+                        sh 'git clone https://github.com/MdAbdullah5/Abdullah_infintudeIT'
+                        sh 'cd ./Abdullah_infintudeIT'
                         sh 'terraform init'
                         
                         // Apply the Terraform script and auto-approve
@@ -58,8 +50,8 @@ pipeline {
                     sh """
                     ssh -o StrictHostKeyChecking=no ec2-user@${env.INSTANCE_IP} << 'EOF'
                     sudo yum install -y git
-                    git clone ${GITHUB_REPO} fastapi_app
-                    cd fastapi_app/${PYTHON_DIR}  # Navigate to the FastAPI app directory
+                    git clone ${GITHUB_REPO}
+                    cd ./Abdullah_infintudeIT  # Navigate to the FastAPI app directory
                     sudo yum install python3-pip -y
                     sudo pip3 install fastapi uvicorn sqlite
                     nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
