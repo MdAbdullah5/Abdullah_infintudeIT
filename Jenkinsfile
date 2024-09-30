@@ -25,7 +25,7 @@ pipeline {
                     // Change directory to where the Terraform file is located
                     dir(TERRAFORM_DIR) {
                         // Initialize Terraform
-                        sh 'git clone https://github.com/MdAbdullah5/Abdullah_infintudeIT'
+                        sh 'git clone https://github.com/MdAbdullah5/Abdullah_infintudeIT.git'
                         sh 'cd ./Abdullah_infintudeIT'
                         sh 'terraform init'
                         
